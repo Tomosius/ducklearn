@@ -56,10 +56,6 @@ repos:
             "--warn-redundant-casts",
           ]
 
-  # ---------- FRONTEND: ESLint (use your project's node_modules) ----------
-  # Runs eslint from src/frontend/node_modules against staged frontend files
-  # ESLint via src/frontend's node_modules
-
   # ---------- MARKDOWN ----------
   - repo: https://github.com/hukkin/mdformat
     rev: 0.7.22
