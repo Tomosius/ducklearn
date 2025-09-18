@@ -1,4 +1,138 @@
+# .pre-commit-config.yaml
+fail_fast: true
+default_install_hook_types: [pre-commit, commit-msg]
+default_language_version:
+  python: python3.11
+
+exclude: |
+  (?x)^(
+      node_modules/.*|
+      \.venv/.*|
+      dist/.*|
+      build/.*|
+      docs/site/.*|
+      \.history/.*|
+      .*/__pycache__/.*|
+      .*\.min\.(js|css)$
+  )$
+
 repos:
+  # ---------- PYTHON: Ruff (formatter + linter/fixer/imports) ----------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.1
+    hooks:
+      - id: ruff-format
+        name: "🐍 Ruff · format (Black-like)"
+        types: [python]
+        args: ["--line-length", "100"]
+
+      - id: ruff
+        name: "🐍 Ruff · lint & fix (imports, unused, pyupgrade, bugbear, etc.)"
+        types: [python]
+        args:
+          [
+            "--fix",
+            "--line-length",
+            "100",
+            "--select",
+            "E,W,F,I,UP,B,C4,SIM,RET,PIE,TCH,ARG,DTZ,ERA,PL,RUF,C90",
+            "--ignore",
+            "E501",
+          ]
+
+  # ---------- PYTHON: Type checking (tame defaults; tighten later) ----------
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.18.1
+    hooks:
+      - id: mypy
+        name: "🧠 mypy · basic type checking"
+        types: [python]
+        args:
+          [
+            "--python-version=3.11",
+            "--ignore-missing-imports",
+            "--check-untyped-defs",
+            "--warn-unused-ignores",
+            "--warn-redundant-casts",
+          ]
+
+  # ---------- FRONTEND: ESLint (use your project's node_modules) ----------
+  # Runs eslint from src/frontend/node_modules against staged frontend files
+  # ESLint via src/frontend's node_modules
+
+  # ---------- MARKDOWN ----------
+  - repo: https://github.com/hukkin/mdformat
+    rev: 0.7.22
+    hooks:
+      - id: mdformat
+        name: "📝 mdformat (Markdown)"
+        types: [markdown]
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-frontmatter
+          - mdformat-ruff
+
+  # ---------- SQL (DuckDB dialect) ----------
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.4.2
+    hooks:
+      - id: sqlfluff-fix
+        name: "📊 SQLFluff · format (DuckDB)"
+        files: \.(sql|ddl)$
+        args: ["--dialect", "duckdb"]
+      # Uncomment if you also want a lint-only pass:
+      # - id: sqlfluff-lint
+      #   files: \.(sql|ddl)$
+      #   args: ["--dialect", "duckdb"]
+
+  # ---------- CONFIG & REPO HYGIENE ----------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=5000"]
+      - id: detect-private-key
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+
+  # Validate pyproject.toml schema
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.24.1
+    hooks:
+      - id: validate-pyproject
+        name: "📦 validate-pyproject"
+
+  # Validate GitHub workflows (add more schemas later if you want)
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.34.0
+    hooks:
+      - id: check-github-workflows
+        name: "🐙 check-jsonschema · GitHub Actions"
+        args: ["--verbose"]
+
+  # ---------- TEXT QUALITY ----------
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        name: "🔤 codespell"
+        args: ["--write-changes"]
+        additional_dependencies: ["tomli"]
+
+  # ---------- SECRETS ----------
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+        name: "🔒 gitleaks · detect hardcoded secrets"
+
+  # ---------- COMMIT MESSAGES ----------
+  # Validate each commit message as you create it
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.9.1
     hooks:
@@ -9,3 +143,12 @@ repos:
       # Keep branch name checks at push time and allow 'main'
       - id: commitizen-branch
         stages: [pre-push]
+  # _________ Svelte inspection __________
+  - repo: local
+    hooks:
+      - id: svelte-check
+        name: "✨ svelte-check (types)"
+        language: system
+        files: ^src/frontend/
+        entry: bash -lc 'npx --prefix src/frontend --no-install svelte-check --tsconfig ./src/frontend/tsconfig.json'
+        pass_filenames: false
