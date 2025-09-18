@@ -1,0 +1,21 @@
+[project]
+authors = [{name = "Tomas Pecukevicius", email = "pecukevicius@gmail.com"}]
+name = "ducklearn"
+requires-python = ">= 3.11"
+version = "0.1.0"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-arm64"]
+
+[tool.pixi.pypi-dependencies]
+ducklearn = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+nodejs = ">=24.4.1,<24.5"
