@@ -1,3 +1,5 @@
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+frontend/node_modules/*
+tomosius_private/*
