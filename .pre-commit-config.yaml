@@ -9,4 +9,3 @@ repos:
       # Keep branch name checks at push time and allow 'main'
       - id: commitizen-branch
         stages: [pre-push]
-        args: ["--", "--allow-branch", "main"]
