@@ -2,8 +2,11 @@ repos:
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.9.1
     hooks:
+      # Validate each commit message as you create it
       - id: commitizen
         stages: [commit-msg]
+
+      # Keep branch name checks at push time and allow 'main'
       - id: commitizen-branch
         stages: [pre-push]
         args: ["--", "--allow-branch", "main"]
