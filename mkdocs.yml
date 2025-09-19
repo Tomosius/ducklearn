@@ -1,0 +1,98 @@
+site_name: DuckLearn
+site_url: https://Tomosius.github.io/ducklearn/
+
+repo_url: https://github.com/Tomosius/ducklearn
+repo_name: Tomosius/ducklearn
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - content.code.copy
+    - content.tabs.link
+    - search.suggest
+    - toc.integrate
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+
+extra:
+  version:
+    provider: mike
+
+plugins:
+  - search
+  - autorefs
+  - section-index
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: ["src"]
+          options:
+            docstring_style: google
+            show_source: true
+            separate_signature: true
+            show_if_no_docstring: true
+  - macros
+  - include-markdown
+  - mermaid2
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+      enable_creation_date: true
+      type: datetime
+      locale: en
+  - minify:
+      minify_html: true
+  - charts
+  - drawio
+  - markdownextradata
+  - redirects:
+      redirect_maps: {}
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: vegalite
+          class: vegalite
+          format: !!python/name:mkdocs_charts_plugin.fences.fence_vegalite
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
+
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.emoji
+  - pymdownx.snippets
+  - pymdownx.tasklist
+
+# Required JS for the charts (Vega-Lite) fence:
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/vega@5
+  - https://cdn.jsdelivr.net/npm/vega-lite@5
+  - https://cdn.jsdelivr.net/npm/vega-embed@6
+
+watch:
+  - src/backend
+
+nav:
+  - Home: index.md
+  # - Guide:
+  #   - guide/index.md
+  #   - guide/install.md
+  #   - guide/usage.md

@@ -1,33 +1,67 @@
 [project]
-authors = [{name = "Tomas Pecukevicius", email = "pecukevicius@gmail.com"}]
 name = "ducklearn"
-requires-python = ">= 3.11"
 version = "0.1.0"
-dependencies = ["pywebview>=6.0,<7"]
+authors = [{name = "Tomas Pecukevicius", email = "pecukevicius@gmail.com"}]
+requires-python = ">=3.11"
+# Runtime-only deps (what your app needs to run)
+dependencies = [
+  "pywebview>=6,<7",
+  "duckdb>=1.0.0,<2",         # if you use DuckDB at runtime
+  "sqlglot>=25,<26",          # if you build SQL dynamically
+  "platformdirs>=4,<5"        # for proper app data/cache paths
+]
 
 [build-system]
-build-backend = "hatchling.build"
 requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/backend"]
 
 [tool.pixi.workspace]
 channels = ["conda-forge"]
 platforms = ["osx-arm64"]
 
-
-[tool.pixi.tasks]
-
-[tool.pixi.pypi-dependencies]
-ducklearn = { path = ".", editable = true }
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/backend"]
-
 [tool.pixi.dependencies]
-nodejs = ">=24.4.1,<24.5"
 python = "3.11.*"
+nodejs = ">=24.4.1,<24.5"
 commitizen = ">=4.9.1,<5"
 pre-commit = ">=4.3.0,<5"
 pytest = ">=8.4.2,<9"
+
+# Docs stack — conda-forge first
+mkdocs = ">=1.6.1,<2"
+mkdocs-material = ">=9.6.20,<10"
+pymdown-extensions = ">=10.16.1,<11"
+mkdocstrings = ">=0.30.0,<0.31"
+mkdocstrings-python = ">=1.18.2,<2"
+mike = ">=2.1.3,<3"
+mkdocs-autorefs = ">=1.4.3,<2"
+mkdocs-macros-plugin = ">=1.3.9,<2"
+mkdocs-include-markdown-plugin = ">=7.1.7,<8"
+mkdocs-section-index = ">=0.3.10,<0.4"
+mkdocs-redirects = ">=1.2.1,<2"
+mkdocs-charts-plugin = ">=0.0.12,<0.0.13"
+mkdocs-drawio = ">=1.11.2,<2"
+mkdocs-markdownextradata-plugin = ">=0.2.6,<0.3"
+
+[tool.pixi.pypi-dependencies]
+# PyPI-only (or newer than conda-forge)
+mkdocs-minify-plugin = ">=0.8.0,<0.9"
+mkdocs-coverage = ">=2.0.0,<3"
+mkdocs-awesome-pages-plugin = ">=2.10.1,<3"
+mkdocs-mermaid2-plugin = ">=1.2.2,<2"
+mkdocs-git-revision-date-localized-plugin = ">=1.4.7,<2"
+
+# Editable install of your package for local dev
+ducklearn = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+# Handy tasks (optional)
+docs-serve = "mkdocs serve -a 127.0.0.1:8000"
+docs-build = "mkdocs build -s"
+test = "pytest -q"
+precommit = "pre-commit run --all-files"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -37,3 +71,7 @@ version_provider = "pep621"
 update_changelog_on_bump = true
 major_version_zero = true
 allow_branch = ["main"]
+version_files = [
+  "src/frontend/package.json:^  \"version\":",
+  "mkdocs.yml:^site_version:",
+]

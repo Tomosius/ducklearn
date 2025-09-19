@@ -94,7 +94,6 @@ repos:
       - id: detect-private-key
       - id: check-json
       - id: check-toml
-      - id: check-yaml
 
   # Validate pyproject.toml schema
   - repo: https://github.com/abravalheri/validate-pyproject
@@ -148,3 +147,17 @@ repos:
         files: ^src/frontend/
         entry: bash -lc 'npx --prefix src/frontend --no-install svelte-check --tsconfig ./src/frontend/tsconfig.json'
         pass_filenames: false
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # 1) Safe check for all YAML except mkdocs.yml
+      - id: check-yaml
+        name: check-yaml (safe)
+        exclude: ^mkdocs\.yml$
+
+      # 2) Unsafe check for mkdocs.yml (allows !!python/name)
+      - id: check-yaml
+        name: check-yaml (mkdocs.yml with custom tags)
+        files: ^mkdocs\.yml$
+        args: ["--unsafe"]
