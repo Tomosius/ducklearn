@@ -3,3 +3,6 @@
 !.pixi/config.toml
 frontend/node_modules/*
 tomosius_private/*
+dist/*
+__pycache__
+.DS_Store
