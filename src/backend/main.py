@@ -77,7 +77,7 @@ def main() -> None:
             height=800,
             resizable=True,
         )
-        webview.start(debug=True)
+        webview.start(debug=False)
         return
 
     # Built mode: serve the *directory* so absolute `/_app/...` works

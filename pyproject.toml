@@ -12,7 +12,7 @@ dependencies = [
   "pywebview>=6,<7",              # Desktop window shell
   "duckdb>=1.0.0,<2",             # (optional) embedded analytics DB
   "sqlglot>=25,<26",              # (optional) SQL generation/manipulation
-  "platformdirs>=4,<5",           # OS-correct app data/cache directories
+  "platformdirs>=4,<5", "pytest-testmon>=2.1.3,<3",           # OS-correct app data/cache directories
 ]
 
 # Console entry points (creates a `ducklearn` CLI on install)
@@ -79,6 +79,11 @@ mkdocs-markdownextradata-plugin = ">=0.2.6,<0.3"
 loguru = ">=0.7.3,<0.8"           # Nice logging during dev
 hatch = ">=1.14.1,<2"             # CLI for Hatch (optional but handy)
 pip = ">=25.2,<26"                 # Ensure a recent pip inside Pixi’s env
+pytest-cov = ">=7.0.0,<8"
+pytest-xdist = ">=3.8.0,<4"
+pytest-metadata = ">=3.1.1,<4"
+rich = ">=14.1.0,<15"
+pytest-html = ">=4.1.1,<5"
 
 # PyPI-only deps (or versions newer than conda-forge). These install via pip
 # inside the Pixi environment.
@@ -110,6 +115,8 @@ version_files = [
   "mkdocs.yml:^site_version:",
 ]
 
+
+
 # -----------------------------------------------------------------------------
 # Pixi tasks (nice aliases so you don’t memorize long commands)
 # -----------------------------------------------------------------------------
@@ -138,7 +145,6 @@ docs-build = "mkdocs build -s"
 fmt  = "pre-commit run -a ruff-format mdformat sqlfluff-fix trailing-whitespace end-of-file-fixer mixed-line-ending"
 lint = "pre-commit run -a ruff mypy check-json check-toml validate-pyproject codespell gitleaks svelte-check check-yaml check-merge-conflict check-added-large-files detect-private-key"
 precommit = "pre-commit run --all-files"
-test = "pytest -q"
 ci = "pre-commit run -a check-github-workflows"
 
 # ---------- Build & package ----------
@@ -162,3 +168,21 @@ wheel-run = "ducklearn"
 
 # ---------- Cleanup ----------
 clean = "bash -lc 'rm -rf src/frontend/build dist .pytest_cache .mypy_cache .ruff_cache .svelte-kit'"
+
+
+# --- Tests ---
+# Fast, incremental runs (testmon) + terminal coverage + full Rich table summary
+test = "bash -lc 'PYTHONPATH=src pytest -q --testmon --cov=src --cov-report=term-missing --test-report=full'"
+
+# Full run (no testmon) + terminal coverage + full Rich table summary
+test-full = "bash -lc 'PYTHONPATH=src pytest -q --cov=src --cov-report=term-missing --test-report=full'"
+
+# Pretty HTML report + HTML coverage; auto-opens the report
+test-html = """
+bash -lc 'mkdir -p reports && \
+PYTHONPATH=src pytest -q \
+  --cov=src --cov-report=term-missing --cov-report=html:reports/coverage \
+  --test-report=full \
+  --html=reports/tests.html --self-contained-html --open-html \
+  --repo-url-base=\"https://github.com/Tomosius/ducklearn/blob/main\"'
+"""
