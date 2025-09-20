@@ -111,7 +111,7 @@ major_version_zero = true         # Treat 0.x as pre-1.0 semantics
 allow_branch = ["main"]           # Restrict commits to these branches
 # Auto-bump versions in these files when you release with Commitizen
 version_files = [
-  "src/frontend/package.json:^  \"version\":",
+  "src/frontend/package.json:^\\s*\"version\":",
   "mkdocs.yml:^site_version:",
 ]
 

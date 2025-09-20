@@ -4,6 +4,7 @@ site_url: https://Tomosius.github.io/ducklearn/
 repo_url: https://github.com/Tomosius/ducklearn
 repo_name: Tomosius/ducklearn
 edit_uri: edit/main/docs/
+site_version: "0.1.0"
 
 theme:
   name: material
