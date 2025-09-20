@@ -36,6 +36,7 @@ exclude = [
   "tests",
 ]
 
+
 # Include non-Python files in the wheel as well. `force-include` copies the given
 # path(s) into the wheel verbatim at the destination you choose. Below, we bundle
 # the built Svelte app so it ships inside the wheel.
