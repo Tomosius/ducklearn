@@ -486,8 +486,8 @@ packages:
   requires_python: '>=3.9.0'
 - pypi: ./
   name: ducklearn
-  version: 0.1.0
-  sha256: 755afe1cc5af8a4f3288162af104c429de82bdb20dc7b237955bae2738d40f34
+  version: 0.1.1
+  sha256: 61495c6051174f26ff55a928c474fcc9324d68057c7c28fc93a80ccea0147b7f
   requires_dist:
   - pywebview>=6,<7
   - duckdb>=1.0.0,<2

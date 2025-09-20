@@ -31,6 +31,10 @@ build-backend = "hatchling.build"
 # so it installs as `backend` in site-packages.
 [tool.hatch.build.targets.wheel]
 packages = ["src/backend"]
+exclude = [
+  "src/backend/main_dev.py",
+  "tests",
+]
 
 # Include non-Python files in the wheel as well. `force-include` copies the given
 # path(s) into the wheel verbatim at the destination you choose. Below, we bundle
@@ -126,14 +130,14 @@ version_files = [
 dev-frontend = "npm --prefix src/frontend run dev -- --host 127.0.0.1 --port 5173"
 
 # Start backend in dev mode (points to the dev server above)
-dev-backend  = "python src/backend/main.py --dev --port 5173"
+dev-backend  = "python src/backend/main_dev.py --port 5173"
 
 # One-shot combo: runs frontend in background, then backend.
 # When you close the backend (Ctrl+C), it stops the frontend too.
 dev = """bash -lc '
 npm --prefix src/frontend run dev -- --host 127.0.0.1 --port 5173 & FE_PID=$!;
 sleep 1;
-python src/backend/main.py --dev --port 5173;
+python src/backend/main_dev.py --port 5173;
 kill $FE_PID || true
 '"""
 
@@ -185,4 +189,13 @@ PYTHONPATH=src pytest -q \
   --test-report=full \
   --html=reports/tests.html --self-contained-html --open-html \
   --repo-url-base=\"https://github.com/Tomosius/ducklearn/blob/main\"'
+"""
+# Release, perform commitizen version numbering and ppush to github with follow-tags
+release = """
+bash -lc '
+set -e
+pixi run precommit
+cz bump
+git push --follow-tags
+'
 """
