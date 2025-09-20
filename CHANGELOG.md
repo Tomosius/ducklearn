@@ -1,3 +1,9 @@
+## v0.1.1 (2025-09-20)
+
+### Fix
+
+- testing cs bump sync between apps
+
 ## v0.1.0 (2025-09-20)
 
 ### Feat
