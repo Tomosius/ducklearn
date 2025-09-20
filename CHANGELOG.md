@@ -1,3 +1,13 @@
+## v0.2.0 (2025-09-20)
+
+### Feat
+
+- split main into build and dev
+
+### Fix
+
+- fixing pyproject , minor issues
+
 ## v0.1.1 (2025-09-20)
 
 ### Fix

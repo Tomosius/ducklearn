@@ -487,7 +487,7 @@ packages:
 - pypi: ./
   name: ducklearn
   version: 0.1.1
-  sha256: 61495c6051174f26ff55a928c474fcc9324d68057c7c28fc93a80ccea0147b7f
+  sha256: be8e9ce1fa67955515c9b7175a43637475ab1f432d7bc89ff4fc41f3fe1b8ed9
   requires_dist:
   - pywebview>=6,<7
   - duckdb>=1.0.0,<2
