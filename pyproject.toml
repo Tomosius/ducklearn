@@ -1,42 +1,67 @@
+# -----------------------------------------------------------------------------
+# Project metadata (PEP 621)
+# -----------------------------------------------------------------------------
 [project]
-name = "ducklearn"
-version = "0.1.0"
+name = "ducklearn"                # Distribution/package name on PyPI
+version = "0.1.0"                 # Bump with Commitizen or manually
 authors = [{ name = "Tomas Pecukevicius", email = "pecukevicius@gmail.com" }]
-requires-python = ">=3.11"
+requires-python = ">=3.11"        # Minimum Python version your app supports
+
+# Runtime-only dependencies (installed when users install ducklearn)
 dependencies = [
-  "pywebview>=6,<7",
-  "duckdb>=1.0.0,<2",
-  "sqlglot>=25,<26",
-  "platformdirs>=4,<5",
+  "pywebview>=6,<7",              # Desktop window shell
+  "duckdb>=1.0.0,<2",             # (optional) embedded analytics DB
+  "sqlglot>=25,<26",              # (optional) SQL generation/manipulation
+  "platformdirs>=4,<5",           # OS-correct app data/cache directories
 ]
 
+# Console entry points (creates a `ducklearn` CLI on install)
 [project.scripts]
-ducklearn = "backend.main:main"
+ducklearn = "backend.main:main"   # Calls main() inside backend/main.py
 
+# -----------------------------------------------------------------------------
+# Build backend (Hatchling)
+# -----------------------------------------------------------------------------
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling"]          # Tool that builds your wheel/sdist
 build-backend = "hatchling.build"
 
-# ✅ Tell Hatch to include static assets from backend package
+# What *Python package(s)* to include in the wheel. These are code folders
+# containing __init__.py (i.e., real packages). Here we package `src/backend`
+# so it installs as `backend` in site-packages.
 [tool.hatch.build.targets.wheel]
 packages = ["src/backend"]
 
-# Include non-Python files *inside the backend package*
+# Include non-Python files in the wheel as well. `force-include` copies the given
+# path(s) into the wheel verbatim at the destination you choose. Below, we bundle
+# the built Svelte app so it ships inside the wheel.
+#
+# NOTE:
+# - Left side is your source path in this repo.
+# - Right side is the *destination path inside the wheel*. Keeping the same path
+#   works, but many projects prefer placing assets under the Python package,
+#   e.g. "backend/frontend_build". If you change the destination, update your
+#   runtime code accordingly (importlib.resources is recommended).
 [tool.hatch.build.targets.wheel.force-include]
 "src/frontend/build" = "src/frontend/build"
 
+# -----------------------------------------------------------------------------
+# Pixi workspace (dev environment manager)
+# -----------------------------------------------------------------------------
 [tool.pixi.workspace]
-channels = ["conda-forge"]
-platforms = ["osx-arm64"]
+channels = ["conda-forge"]        # Conda channel(s) used by Pixi
+platforms = ["osx-arm64"]         # Target platform(s) for reproducible envs
 
+# Dev dependencies installed into the Pixi environment (not shipped to users).
+# Keep these pinned with sane ranges for reproducible CI/local dev.
 [tool.pixi.dependencies]
 python = "3.11.*"
-nodejs = ">=24.4.1,<24.5"
-commitizen = ">=4.9.1,<5"
-pre-commit = ">=4.3.0,<5"
-pytest = ">=8.4.2,<9"
+nodejs = ">=24.4.1,<24.5"         # For building the Svelte frontend
+commitizen = ">=4.9.1,<5"         # Conventional commit helper
+pre-commit = ">=4.3.0,<5"         # Pre-commit hooks runner
+pytest = ">=8.4.2,<9"             # Test framework
 
-# Docs stack — conda-forge first
+# ---- Documentation stack (Conda packages first when available) ----
 mkdocs = ">=1.6.1,<2"
 mkdocs-material = ">=9.6.20,<10"
 pymdown-extensions = ">=10.16.1,<11"
@@ -51,37 +76,89 @@ mkdocs-redirects = ">=1.2.1,<2"
 mkdocs-charts-plugin = ">=0.0.12,<0.0.13"
 mkdocs-drawio = ">=1.11.2,<2"
 mkdocs-markdownextradata-plugin = ">=0.2.6,<0.3"
-loguru = ">=0.7.3,<0.8"
-hatch = ">=1.14.1,<2"
-pip = ">=25.2,<26"
+loguru = ">=0.7.3,<0.8"           # Nice logging during dev
+hatch = ">=1.14.1,<2"             # CLI for Hatch (optional but handy)
+pip = ">=25.2,<26"                 # Ensure a recent pip inside Pixi’s env
 
+# PyPI-only deps (or versions newer than conda-forge). These install via pip
+# inside the Pixi environment.
 [tool.pixi.pypi-dependencies]
-# PyPI-only (or newer than conda-forge)
 mkdocs-minify-plugin = ">=0.8.0,<0.9"
 mkdocs-coverage = ">=2.0.0,<3"
 mkdocs-awesome-pages-plugin = ">=2.10.1,<3"
 mkdocs-mermaid2-plugin = ">=1.2.2,<2"
 mkdocs-git-revision-date-localized-plugin = ">=1.4.7,<2"
 
-# Editable install of your package for local dev
+# Local editable install of this project into the Pixi environment.
+# Lets you `import backend` and run `ducklearn` while you iterate.
 ducklearn = { path = ".", editable = true }
 
-[tool.pixi.tasks]
-# Handy tasks (optional)
-docs-serve = "mkdocs serve -a 127.0.0.1:8000"
-docs-build = "mkdocs build -s"
-test = "pytest -q"
-precommit = "pre-commit run --all-files"
-
+# -----------------------------------------------------------------------------
+# Commitizen (conventional commits & versioning)
+# -----------------------------------------------------------------------------
 [tool.commitizen]
-name = "cz_conventional_commits"
-tag_format = "v$version"
-version_scheme = "pep440"
-version_provider = "pep621"
-update_changelog_on_bump = true
-major_version_zero = true
-allow_branch = ["main"]
+name = "cz_conventional_commits"  # Conventional Commits adapter
+tag_format = "v$version"          # Git tag format
+version_scheme = "pep440"         # Version semantics
+version_provider = "pep621"       # Read from [project].version
+update_changelog_on_bump = true   # Auto-update CHANGELOG on bump
+major_version_zero = true         # Treat 0.x as pre-1.0 semantics
+allow_branch = ["main"]           # Restrict commits to these branches
+# Auto-bump versions in these files when you release with Commitizen
 version_files = [
   "src/frontend/package.json:^  \"version\":",
   "mkdocs.yml:^site_version:",
 ]
+
+# -----------------------------------------------------------------------------
+# Pixi tasks (nice aliases so you don’t memorize long commands)
+# -----------------------------------------------------------------------------
+[tool.pixi.tasks]
+# ---------- Dev ----------
+# Start SvelteKit dev server (frontend)
+dev-frontend = "npm --prefix src/frontend run dev -- --host 127.0.0.1 --port 5173"
+
+# Start backend in dev mode (points to the dev server above)
+dev-backend  = "python src/backend/main.py --dev --port 5173"
+
+# One-shot combo: runs frontend in background, then backend.
+# When you close the backend (Ctrl+C), it stops the frontend too.
+dev = """bash -lc '
+npm --prefix src/frontend run dev -- --host 127.0.0.1 --port 5173 & FE_PID=$!;
+sleep 1;
+python src/backend/main.py --dev --port 5173;
+kill $FE_PID || true
+'"""
+
+# ---------- Docs ----------
+docs-serve = "mkdocs serve -a 127.0.0.1:8000"
+docs-build = "mkdocs build -s"
+
+# ---------- Quality ----------
+fmt  = "pre-commit run -a ruff-format mdformat sqlfluff-fix trailing-whitespace end-of-file-fixer mixed-line-ending"
+lint = "pre-commit run -a ruff mypy check-json check-toml validate-pyproject codespell gitleaks svelte-check check-yaml check-merge-conflict check-added-large-files detect-private-key"
+precommit = "pre-commit run --all-files"
+test = "pytest -q"
+ci = "pre-commit run -a check-github-workflows"
+
+# ---------- Build & package ----------
+# Build the production frontend (to src/frontend/build)
+build-frontend = "npm --prefix src/frontend run build"
+
+# Build Python wheel (uses Hatch)
+build-wheel = "hatch build"
+
+# Convenience: do both
+build-app = "bash -lc 'pixi run build-frontend && pixi run build-wheel'"
+
+# ---------- Run built app ----------
+# Launch backend serving the built assets (no dev server)
+run-built = "python src/backend/main.py"
+
+# ---------- Wheel smoke-test ----------
+# Reinstall the freshly built wheel into the Pixi env and run the CLI
+wheel-install = "bash -lc 'pip install --force-reinstall --no-deps dist/ducklearn-*.whl'"
+wheel-run = "ducklearn"
+
+# ---------- Cleanup ----------
+clean = "bash -lc 'rm -rf src/frontend/build dist .pytest_cache .mypy_cache .ruff_cache .svelte-kit'"
