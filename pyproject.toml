@@ -9,11 +9,20 @@ license = { text = "Apache-2.0" }
 authors = [
     { name = "Tomas Pecukevicius" }
 ]
-
-urls = { "Homepage" = "https://github.com/Tomosius/ducklearn", "Repository" = "https://github.com/Tomosius/ducklearn", "Issues" = "https://github.com/Tomosius/ducklearn/issues" }
-
+# No Python dependencies here (Conda is source of truth)
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/Tomosius/ducklearn"
+Repository = "https://github.com/Tomosius/ducklearn"
+Issues = "https://github.com/Tomosius/ducklearn/issues"
+
+
+
+
+# ────────────────────────────────────────────────
+# Commitizen — versioning & changelog
+# ────────────────────────────────────────────────
 [tool.commitizen]
 name = "cz_conventional_commits"
 tag_format = "v$version"
@@ -22,3 +31,75 @@ version_provider = "pep621"
 update_changelog_on_bump = true
 major_version_zero = true
 changelog_file = "CHANGELOG.md"
+
+
+# ────────────────────────────────────────────────
+# Ruff — Lint, Format, Imports, PyUpgrade, Security, Bugbear
+# STRICT preset optimized for scientific/ML work.
+# ────────────────────────────────────────────────
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+respect-gitignore = true
+
+select = [
+    "E",     # pycodestyle
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "N",     # pep8-naming
+    "I",     # isort
+    "UP",    # pyupgrade
+    "B",     # bugbear
+    "S",     # bandit (security)
+    "PL",    # pylint-like rules
+    "C4",    # comprehensions optimization
+    "TID",   # tidy imports
+    "PERF",  # performance checks
+]
+
+ignore = [
+    "E501",  # formatter handles line length
+]
+
+fix = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+
+# ────────────────────────────────────────────────
+# Mypy — strict typing for future Mojo/Cython migration
+# ────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+ignore_missing_imports = true
+
+# STRICT MODE
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = false  # ML code often calls C libs
+disallow_untyped_decorators = false
+check_untyped_defs = true
+
+
+# ────────────────────────────────────────────────
+# Pyright (for IDE real-time type-checking)
+# ────────────────────────────────────────────────
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+useLibraryCodeForTypes = true
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportUnusedVariable = true
+reportUnusedImport = true
+reportUntypedFunctionDecorator = false
+reportUnboundVariable = true

@@ -1,19 +1,14 @@
-name: base
+name: ducklearn
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.13
-  - conda=25.11.0
-  - setuptools
-  - pip
-  - wheel
-  - conda-anaconda-telemetry[version='>=0.3.0']
-  - conda-anaconda-tos[version='>=0.2.2']
-  - conda-content-trust
-  - conda-libmamba-solver
-  - menuinst
-  - python.app
-  - anaconda-anon-usage
-  - anaconda-auth
-prefix: /opt/homebrew/Caskroom/miniconda/base
+  - python=3.12
+  - mypy
+  - pyright
+  - pre-commit
+  - sqlglot
+  - commitizen
+  - pytest
+  - ruff
+prefix: /opt/homebrew/Caskroom/miniconda/base/envs/ducklearn
