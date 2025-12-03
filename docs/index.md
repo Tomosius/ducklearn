@@ -1,6 +1,6 @@
 
 ---
-title: DuckLearn111
+title: DuckLearn
 hide:
   - title
 ---
