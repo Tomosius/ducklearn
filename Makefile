@@ -1,42 +1,33 @@
 ################################################################################
 # Project Makefile
 #
-# This Makefile manages:
-# - Conda environment creation & updates
-# - Python version extraction & syncing across configs
-# - Code formatting & linting with ruff
-# - Automated tooling (pre-commit, project install)
-#
-# NOTE:
-# - environment.yml is the single source of truth for Python version.
-# - Running `make sync` updates pyproject.toml automatically.
+# Code Quality + Environment Sync + Editable Install + Testing
 ################################################################################
 
-
-# ==============================================================================
-# ENVIRONMENT CONFIGURATION
-# ==============================================================================
-
-# Name of the conda environment for this project
 ENV_NAME = ducklearn
 
+# Run tools inside conda environment
+PYTHON        = conda run -n $(ENV_NAME) python
+RUFF          = conda run -n $(ENV_NAME) ruff
+PYLINT        = conda run -n $(ENV_NAME) pylint
+PYDOCSTYLE    = conda run -n $(ENV_NAME) pydocstyle
+VULTURE       = conda run -n $(ENV_NAME) vulture
+DOCFORMATTER  = conda run -n $(ENV_NAME) docformatter
+INTERROGATE   = conda run -n $(ENV_NAME) interrogate
+PYROMA        = conda run -n $(ENV_NAME) pyroma
+PYTEST        = conda run -n $(ENV_NAME) pytest
+MUTMUT        = conda run -n $(ENV_NAME) mutmut
 
-# Aliases for running tools inside conda environment
-PYTHON = conda run -n $(ENV_NAME) python
-RUFF   = conda run -n $(ENV_NAME) ruff
 
-
-# ==============================================================================
+################################################################################
 # INSTALLATION
-# ==============================================================================
+################################################################################
 
-## make install
-## Create or update the conda environment, install project, enable pre-commit
 install:
-	@echo ">>> Creating or updating conda environment..."
+	@echo ">>> Creating / updating conda environment..."
 	conda env update -f environment.yml --prune
 
-	@echo ">>> Installing project in editable mode..."
+	@echo ">>> Installing project (-e)..."
 	conda run -n $(ENV_NAME) pip install -e .
 
 	@echo ">>> Installing pre-commit hooks..."
@@ -45,16 +36,12 @@ install:
 	@echo ">>> Installation complete!"
 
 
-# ==============================================================================
-# SYNC SYSTEM (Python version + config alignment)
-# ==============================================================================
+################################################################################
+# SYNC
+################################################################################
 
-## make sync
-## 1. Rebuild environment using environment.yml
-## 2. Export cleaned environment.yml (from-history)
-## 3. Sync Python version to pyproject.toml
 sync:
-	@echo ">>> Exporting minimal environment.yml (from-history)..."
+	@echo ">>> Exporting clean environment.yml..."
 	conda env export --from-history > environment.yml
 
 	@echo ">>> Extracting Python version from environment.yml..."
@@ -65,32 +52,101 @@ sync:
 	@echo ">>> Sync complete!"
 
 
-# ==============================================================================
-# CODE QUALITY COMMANDS (Ruff)
-# ==============================================================================
+################################################################################
+# CODE QUALITY — Ruff
+################################################################################
 
-## make format
-## Format all Python code using ruff formatter
 format:
-	@echo ">>> Formatting code with ruff..."
+	@echo ">>> Running ruff format..."
 	$(RUFF) format .
-	@echo ">>> Formatting complete."
+	@echo ">>> Done."
 
-## make lint
-## Lint code without modifying files
 lint:
-	@echo ">>> Running ruff linter..."
+	@echo ">>> Running ruff lint..."
 	$(RUFF) check .
-	@echo ">>> Linting complete."
+	@echo ">>> Done."
 
-## make fix
-## Lint + autofix code
 fix:
-	@echo ">>> Running ruff with autofix..."
+	@echo ">>> Running ruff fix..."
 	$(RUFF) check --fix .
-	@echo ">>> Autofix complete."
+	@echo ">>> Done."
 
-## make check
-## Combined CI-style check (format validation + lint)
-check: format lint
-	@echo ">>> All checks passed!"
+
+################################################################################
+# CODE QUALITY — Deep tools
+################################################################################
+
+pylint:
+	@echo ">>> Running pylint..."
+	$(PYLINT) ducklearn || true
+
+pydocstyle:
+	@echo ">>> Checking docstring style..."
+	$(PYDOCSTYLE) ducklearn || true
+
+docfmt:
+	@echo ">>> Formatting docstrings..."
+	$(DOCFORMATTER) -r -i ducklearn
+	@echo ">>> Docstrings formatted."
+
+vulture:
+	@echo ">>> Detecting dead code..."
+	$(VULTURE) ducklearn || true
+
+interrogate:
+	@echo ">>> Checking docstring coverage..."
+	$(INTERROGATE) -c pyproject.toml ducklearn || true
+
+pyroma:
+	@echo ">>> Checking project metadata quality..."
+	$(PYROMA) . || true
+
+
+################################################################################
+# FULL QUALITY PASS (CI-like)
+################################################################################
+
+quality: format lint pylint pydocstyle vulture interrogate pyroma
+	@echo "==================================================="
+	@echo "   ALL QUALITY CHECKS COMPLETE"
+	@echo "==================================================="
+
+check: quality
+
+
+###############################################################################
+# TESTING
+#
+# test        - fast run: failed + new tests (quick feedback)
+# test-cov    - full suite with coverage
+# test-full   - full suite + coverage + mutation testing
+###############################################################################
+
+## make test
+## Quick tests: only failed + newly added tests
+
+
+test:
+	@echo ">>> Cleaning leftover mutation artifacts..."
+	@if [ -d "mutants" ]; then rm -rf mutants; fi
+	@echo ">>> Running quick tests (failures + new tests)..."
+	$(PYTEST) --lf --new-first || true
+	@echo ">>> Quick test cycle complete."
+
+## make test-cov
+## Full test suite with coverage
+test-cov:
+	@echo ">>> Cleaning leftover mutation artifacts..."
+	@if [ -d "mutants" ]; then rm -rf mutants; fi
+	@echo ">>> Running full test suite with coverage..."
+	$(PYTEST) --cov=ducklearn --cov-report=term-missing .
+	@echo ">>> Coverage run complete."
+
+## make test-full
+## Full tests + coverage + mutation testing
+test-full: test-cov
+	@echo ">>> Starting mutation testing with mutmut..."
+	$(MUTMUT) run || true
+	@echo ">>> Mutation testing results:"
+	$(MUTMUT) results || true
+	@echo ">>> Full test suite complete."

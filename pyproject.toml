@@ -1,25 +1,34 @@
 [project]
 name = "ducklearn"
 version = "0.0.1"
-description = "DuckDB based extension for Scikit Learn ML Ecosystem"
-readme = "README.md"
+description = '''
+DuckLearn is a high-performance machine learning toolkit that brings the
+expressiveness of the scikit-learn API directly into DuckDB. It provides
+powerful in-database feature engineering, fast SQL-accelerated model
+evaluation, and seamless interoperability with pandas and NumPy. Designed
+for modern analytics pipelines, DuckLearn enables scalable data
+processing, efficient transformation workflows, and production-ready ML
+components—all without leaving the DuckDB execution engine.
+'''
+readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
-
 authors = [
-    { name = "Tomas Pecukevicius" }
+    { name = "Tomas Pecukevicius", email = "contact@pecuk.dev" }
 ]
-# No Python dependencies here (Conda is source of truth)
-dependencies = []
+keywords = ["duckdb", "machine-learning", "ml", "analytics", "scikit-learn", "data"]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: Apache Software License",
+    "Development Status :: 2 - Pre-Alpha",
+    "Operating System :: OS Independent",
+]
 
+dependencies = []
 [project.urls]
 Homepage = "https://github.com/Tomosius/ducklearn"
 Repository = "https://github.com/Tomosius/ducklearn"
 Issues = "https://github.com/Tomosius/ducklearn/issues"
-
-
-
-
 # ────────────────────────────────────────────────
 # Commitizen — versioning & changelog
 # ────────────────────────────────────────────────
@@ -31,8 +40,6 @@ version_provider = "pep621"
 update_changelog_on_bump = true
 major_version_zero = true
 changelog_file = "CHANGELOG.md"
-
-
 # ────────────────────────────────────────────────
 # Ruff — Lint, Format, Imports, PyUpgrade, Security, Bugbear
 # STRICT preset optimized for scientific/ML work.
@@ -41,7 +48,9 @@ changelog_file = "CHANGELOG.md"
 line-length = 79
 target-version = "py312"
 respect-gitignore = true
+fix = true
 
+[tool.ruff.lint]
 select = [
     "E",     # pycodestyle
     "W",     # pycodestyle warnings
@@ -56,19 +65,21 @@ select = [
     "TID",   # tidy imports
     "PERF",  # performance checks
 ]
-
 ignore = [
     "E501",  # formatter handles line length
 ]
 
-fix = true
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "S101",   # allow assert in tests
+    "PLR2004",# allow magic numbers
+    "E402",   # imports not at top
+]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
-
-
 # ────────────────────────────────────────────────
 # Mypy — strict typing for future Mojo/Cython migration
 # ────────────────────────────────────────────────
@@ -76,7 +87,6 @@ line-ending = "auto"
 python_version = "3.12"
 warn_unused_configs = true
 ignore_missing_imports = true
-
 # STRICT MODE
 strict = true
 warn_unused_ignores = true
@@ -88,8 +98,6 @@ disallow_incomplete_defs = true
 disallow_untyped_calls = false  # ML code often calls C libs
 disallow_untyped_decorators = false
 check_untyped_defs = true
-
-
 # ────────────────────────────────────────────────
 # Pyright (for IDE real-time type-checking)
 # ────────────────────────────────────────────────
@@ -103,3 +111,14 @@ reportUnusedVariable = true
 reportUnusedImport = true
 reportUntypedFunctionDecorator = false
 reportUnboundVariable = true
+# ────────────────────────────────────────────────
+# Packaging — ensure ducklearn/ is included
+# ────────────────────────────────────────────────
+[tool.setuptools]
+package-dir = {"" = "."}
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ducklearn*"]
+
+[tool.vulture]
+exclude = ["tests/*"]

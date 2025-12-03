@@ -11,4 +11,18 @@ dependencies:
   - commitizen
   - pytest
   - ruff
+  - pylint=4.0.4
+  - pydocstyle
+  - vulture
+  - docformatter
+  - pyroma
+  - interrogate
+  - pytest-cov
+  - hypothesis
+  - pytest-mock
+  - typeguard
+  - mutmut
+  - psutil
+  - pip
+  - requests
 prefix: /opt/homebrew/Caskroom/miniconda/base/envs/ducklearn
