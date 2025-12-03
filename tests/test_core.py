@@ -1,6 +1,6 @@
 import pytest
 
-from ducklearn.core import safe_average
+from ducklearn import safe_average
 
 
 def test_average_normal_case() -> None:

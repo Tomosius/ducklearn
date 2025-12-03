@@ -390,3 +390,4 @@ cython_debug/
 
 !/qodana.yaml
 /qodana.yaml
+/mutants/

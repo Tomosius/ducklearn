@@ -1,7 +1,12 @@
+################################################################################
+#                                Project Metadata
+################################################################################
 [project]
 name = "ducklearn"
 version = "0.0.1"
-description = '''
+
+# Short package description shown on PyPI and tooling.
+description = """
 DuckLearn is a high-performance machine learning toolkit that brings the
 expressiveness of the scikit-learn API directly into DuckDB. It provides
 powerful in-database feature engineering, fast SQL-accelerated model
@@ -9,14 +14,26 @@ evaluation, and seamless interoperability with pandas and NumPy. Designed
 for modern analytics pipelines, DuckLearn enables scalable data
 processing, efficient transformation workflows, and production-ready ML
 components—all without leaving the DuckDB execution engine.
-'''
+"""
+
+# Long description (PyPI) pulled from README.md.
 readme = { file = "README.md", content-type = "text/markdown" }
+
+# Minimum Python version supported by this library.
 requires-python = ">=3.12"
+
+# SPDX license declaration.
 license = { text = "Apache-2.0" }
+
+# Project authors.
 authors = [
     { name = "Tomas Pecukevicius", email = "contact@pecuk.dev" }
 ]
+
+# Keywords for discovery on PyPI.
 keywords = ["duckdb", "machine-learning", "ml", "analytics", "scikit-learn", "data"]
+
+# Trove classifiers — used by PyPI for categorization.
 classifiers = [
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: Apache Software License",
@@ -24,14 +41,19 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+# Add runtime dependencies here (currently none).
 dependencies = []
+
+# Links for PyPI and documentation.
 [project.urls]
 Homepage = "https://github.com/Tomosius/ducklearn"
 Repository = "https://github.com/Tomosius/ducklearn"
 Issues = "https://github.com/Tomosius/ducklearn/issues"
-# ────────────────────────────────────────────────
-# Commitizen — versioning & changelog
-# ────────────────────────────────────────────────
+
+
+################################################################################
+#                             Commitizen — Versioning
+################################################################################
 [tool.commitizen]
 name = "cz_conventional_commits"
 tag_format = "v$version"
@@ -40,85 +62,115 @@ version_provider = "pep621"
 update_changelog_on_bump = true
 major_version_zero = true
 changelog_file = "CHANGELOG.md"
-# ────────────────────────────────────────────────
-# Ruff — Lint, Format, Imports, PyUpgrade, Security, Bugbear
-# STRICT preset optimized for scientific/ML work.
-# ────────────────────────────────────────────────
-[tool.ruff]
-line-length = 79
-target-version = "py312"
-respect-gitignore = true
-fix = true
 
+
+################################################################################
+#                              Ruff — Lint + Format
+################################################################################
+[tool.ruff]
+line-length = 79               # Standard for scientific Python
+target-version = "py312"       # Match your minimum supported Python version
+respect-gitignore = true
+fix = true                     # Auto-fix issues when possible
+exclude = [
+    ".git",
+    ".venv",
+    "mutants",                 # MutMut output folder (should not be linted)
+]
+
+# Enable selected rule families ("strict but modern" ML preset)
 [tool.ruff.lint]
 select = [
-    "E",     # pycodestyle
-    "W",     # pycodestyle warnings
-    "F",     # pyflakes
-    "N",     # pep8-naming
-    "I",     # isort
-    "UP",    # pyupgrade
-    "B",     # bugbear
-    "S",     # bandit (security)
-    "PL",    # pylint-like rules
-    "C4",    # comprehensions optimization
-    "TID",   # tidy imports
-    "PERF",  # performance checks
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "N",   # pep8-naming
+    "I",   # import sorting
+    "UP",  # pyupgrade
+    "B",   # bugbear
+    "S",   # bandit (security)
+    "PL",  # pylint-like rules
+    "C4",  # comprehensions optimization
+    "TID", # tidy imports
+    "PERF" # performance checks
 ]
+
 ignore = [
-    "E501",  # formatter handles line length
+    "E501",  # ignore line length (handled by formatter)
 ]
 
+# Ignore some rules for tests
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = [
-    "S101",   # allow assert in tests
-    "PLR2004",# allow magic numbers
-    "E402",   # imports not at top
-]
+"tests/*" = ["S101", "PLR2004", "E402"]
 
+# Formatter settings
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
-# ────────────────────────────────────────────────
-# Mypy — strict typing for future Mojo/Cython migration
-# ────────────────────────────────────────────────
+
+
+################################################################################
+#                               Mypy — Static Types
+################################################################################
 [tool.mypy]
 python_version = "3.12"
+ignore_missing_imports = true    # Useful for ML/DB libraries
 warn_unused_configs = true
-ignore_missing_imports = true
-# STRICT MODE
 strict = true
+
+# Strict-level options:
 warn_unused_ignores = true
 warn_redundant_casts = true
 warn_return_any = true
 warn_unreachable = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
-disallow_untyped_calls = false  # ML code often calls C libs
-disallow_untyped_decorators = false
 check_untyped_defs = true
-# ────────────────────────────────────────────────
-# Pyright (for IDE real-time type-checking)
-# ────────────────────────────────────────────────
+
+# Allow untyped calls (common with ML libs / C extensions)
+disallow_untyped_calls = false
+disallow_untyped_decorators = false
+
+
+################################################################################
+#                       Pyright — IDE Type Checking (Strict)
+################################################################################
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
 useLibraryCodeForTypes = true
+
+# Warnings
 reportMissingImports = true
 reportMissingTypeStubs = false
 reportUnusedVariable = true
 reportUnusedImport = true
 reportUntypedFunctionDecorator = false
 reportUnboundVariable = true
-# ────────────────────────────────────────────────
-# Packaging — ensure ducklearn/ is included
-# ────────────────────────────────────────────────
+
+
+################################################################################
+#                     Packaging — Source Layout (src/ducklearn)
+################################################################################
 [tool.setuptools]
-package-dir = {"" = "."}
+package-dir = { "" = "src" }
+
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 include = ["ducklearn*"]
 
+
+################################################################################
+#                        Vulture — Dead Code Finder
+################################################################################
 [tool.vulture]
 exclude = ["tests/*"]
+
+
+################################################################################
+#                         Pytest Configuration
+################################################################################
+[tool.pytest.ini_options]
+pythonpath = ["src"]   # Ensure tests import ducklearn correctly
+testpaths = ["tests"]  # Only run tests inside tests/

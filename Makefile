@@ -42,13 +42,9 @@ install:
 
 sync:
 	@echo ">>> Exporting clean environment.yml..."
-	conda env export --from-history > environment.yml
-
-	@echo ">>> Extracting Python version from environment.yml..."
-	@PY_VERSION=$$(grep -E 'python=([0-9]+\.[0-9]+)' environment.yml | sed 's/.*python=//'); \
-	echo ">>> Python version detected: $$PY_VERSION"; \
-	python scripts/sync_python_version.py $$PY_VERSION
-
+	conda env export > environment.yml
+	@echo ">>> Syncing Python version from environment..."
+	@conda run -n $(ENV_NAME) python scripts/sync_python_version.py
 	@echo ">>> Sync complete!"
 
 
@@ -78,24 +74,24 @@ fix:
 
 pylint:
 	@echo ">>> Running pylint..."
-	$(PYLINT) ducklearn || true
+	$(PYLINT) src/ducklearn || true
 
 pydocstyle:
 	@echo ">>> Checking docstring style..."
-	$(PYDOCSTYLE) ducklearn || true
+	$(PYDOCSTYLE) src/ducklearn || true
 
 docfmt:
 	@echo ">>> Formatting docstrings..."
-	$(DOCFORMATTER) -r -i ducklearn
+	$(DOCFORMATTER) -r -i src/ducklearn
 	@echo ">>> Docstrings formatted."
 
 vulture:
 	@echo ">>> Detecting dead code..."
-	$(VULTURE) ducklearn || true
+	$(VULTURE) src/ducklearn || true
 
 interrogate:
 	@echo ">>> Checking docstring coverage..."
-	$(INTERROGATE) -c pyproject.toml ducklearn || true
+	$(INTERROGATE) -c pyproject.toml src/ducklearn || true
 
 pyroma:
 	@echo ">>> Checking project metadata quality..."
@@ -150,3 +146,22 @@ test-full: test-cov
 	@echo ">>> Mutation testing results:"
 	$(MUTMUT) results || true
 	@echo ">>> Full test suite complete."
+
+
+################################################################################
+# DOCUMENTATION — MkDocs
+################################################################################
+
+docs-serve:
+	@echo ">>> Serving documentation at http://127.0.0.1:8000 ..."
+	conda run -n $(ENV_NAME) mkdocs serve
+
+docs-build:
+	@echo ">>> Building documentation..."
+	conda run -n $(ENV_NAME) mkdocs build
+	@echo ">>> Build complete."
+
+docs-deploy:
+	@echo ">>> Deploying documentation to GitHub Pages..."
+	conda run -n $(ENV_NAME) mkdocs gh-deploy --force
+	@echo ">>> Deployment complete."
