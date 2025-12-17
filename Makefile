@@ -6,7 +6,7 @@ UV  := uv
 RUN := $(UV) run
 
 # Supported Python minors (must match requires-python in pyproject.toml).
-PY_VERSIONS := 3.12 3.13
+PY_VERSIONS := 3.12 3.13 3.14
 
 GREEN  = \033[1;32m
 RED    = \033[1;31m
@@ -107,7 +107,3 @@ prerelease:
 	@echo "$(GREEN)===================================================$(RESET)"
 	@echo "$(GREEN)   ALL PRE-RELEASE CHECKS PASSED$(RESET)"
 	@echo "$(GREEN)===================================================$(RESET)"
-
-################################################################################
-.PHONY: install dev check check-fast fix test test-cov docs-serve docs-build \
-        docs-deploy prerelease
