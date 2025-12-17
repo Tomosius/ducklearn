@@ -1,8 +1,7 @@
 # ----------------------------------------------------------------------
-# Pre-commit configuration for DuckLearn
+# Pre-commit configuration for DuckLearn (strict, uv-driven)
 # ----------------------------------------------------------------------
 repos:
-  # Basic sanity checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -12,23 +11,37 @@ repos:
       - id: trailing-whitespace
       - id: mixed-line-ending
 
-  # Ruff — fast lint & format
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.0
+  - repo: local
     hooks:
+      - id: ruff-format
+        name: ruff format (uv)
+        entry: uv run ruff format .
+        language: system
+        pass_filenames: false
+
       - id: ruff
-        args: [--fix]
+        name: ruff check (uv)
+        entry: uv run ruff check --fix .
+        language: system
+        pass_filenames: false
 
-  # Mypy — type checking
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
-    hooks:
       - id: mypy
-        additional_dependencies: [types-PyYAML]
+        name: mypy (uv)
+        entry: uv run mypy src/ducklearn
+        language: system
+        pass_filenames: false
+        require_serial: true
 
-  # Docformatter — auto-format docstrings
-  - repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.7
-    hooks:
-      - id: docformatter
-        args: [--in-place, --wrap-summaries=79, --wrap-descriptions=72]
+      - id: pyright
+        name: pyright (uv)
+        entry: uv run pyright src
+        language: system
+        pass_filenames: false
+        require_serial: true
+
+      - id: interrogate
+        name: interrogate (uv)
+        entry: uv run interrogate -c pyproject.toml src/ducklearn
+        language: system
+        pass_filenames: false
+        require_serial: true
