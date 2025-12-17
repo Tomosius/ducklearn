@@ -54,6 +54,7 @@ quality = [
     "mypy>=1.19.1",
     "pydocstyle>=6.3.0",
     "pylint>=4.0.4",
+    "pyright>=1.1.407",
     "pyroma>=5.0.1",
     "ruff>=0.14.9",
     "vulture>=2.14",
@@ -89,7 +90,14 @@ workflow = [
 # Build artifacts for publishing.
 release = [
     "build>=1.3.0",
+    "twine>=6.2.0",
     "wheel>=0.45.1",
+]
+playground = [
+    "jupyter>=1.1.1",
+    "pandas>=2.3.3",
+    "scikit-learn>=1.8.0",
+    "scipy>=1.16.3",
 ]
 
 ################################################################################
