@@ -35,7 +35,7 @@ dev:
 ################################################################################
 
 # Run the exact same checks as a commit would run, but on the whole repo.
-check:
+check-full:
 	@echo "$(BLUE)>>> Running pre-commit on all files...$(RESET)"
 	$(RUN) pre-commit run --all-files --show-diff-on-failure
 	@echo "$(GREEN)---------------------------------------------------$(RESET)"
@@ -43,7 +43,7 @@ check:
 	@echo "$(GREEN)---------------------------------------------------$(RESET)"
 
 # Faster local iteration: run on staged files only.
-check-fast:
+check:
 	@echo "$(BLUE)>>> Running pre-commit on staged files...$(RESET)"
 	$(RUN) pre-commit run --show-diff-on-failure
 
