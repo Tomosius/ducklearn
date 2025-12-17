@@ -1,0 +1,5 @@
+# docs/architecture/.pages
+title: Architecture
+nav:
+  - Code Style: code_style.md
+  - Pipeline: pipeline.md

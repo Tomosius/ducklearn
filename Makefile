@@ -107,3 +107,12 @@ prerelease:
 	@echo "$(GREEN)===================================================$(RESET)"
 	@echo "$(GREEN)   ALL PRE-RELEASE CHECKS PASSED$(RESET)"
 	@echo "$(GREEN)===================================================$(RESET)"
+
+release:
+	uv run cz bump
+	git push --follow-tags
+	@version=$$(python -c "import tomllib; \
+p=tomllib.load(open('pyproject.toml','rb')); \
+print(p['project']['version'])"); \
+	uv run mike deploy --push --update-aliases v$$version latest; \
+	uv run mike set-default --push latest
